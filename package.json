@@ -1,6 +1,6 @@
 {
   "name": "ip-browser",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "In-Page Browser",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pluginmere/ip-browser.git"
+    "url": "git://github.com/pluginmere/ip-browser.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "keywords": [
     "in",
@@ -16,7 +19,10 @@
     "web",
     "browser"
   ],
-  "author": "PluginMere",
+  "author": {
+    "name": "PluginMere",
+    "email": "code@pluginmere.com"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/pluginmere/ip-browser/issues"
