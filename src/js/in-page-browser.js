@@ -1,39 +1,84 @@
 "use strict";
 
+(function (factory) {
 
+  // Establish the root object: `window` OR `global`
+  if (typeof window == 'object' && window.self === window) {
+    var root = window;
 
-function init_ip_browser($) {
-  console.log(">>>>> [?] INIT In Page Browser [?] <<<<<");
+    //NOTE: `window.top` throws access error when "same-origin policy" is applicable
+    //      (but it changes nothing in this case as it is an exit point anyway).
+    if (window.self !== window.top) {
+      return;
+    }
 
-  if (window.in_page_browser || window.self !== window.top) { //NOTE: throws access error when "same-origin policy" is applicable (but it changes nothing in this case).
+  } else if (typeof global == 'object' && global.global === global) {
+    var root = global;
+  };
+
+  if (root.in_page_browser) {
     return;
   }
-  window.in_page_browser = Object.create(null);
-  console.log(">>>>> [!] INIT In Page Browser [!] <<<<<");
+
+  // AMD.
+  if (typeof define === 'function' && define.amd) {
+    define(['jquery', 'exports'], function ($, exports) {
+      // Export global even in AMD just in case.
+      root.in_page_browser = factory(root, exports, $);
+    });
+
+    // Node.js or CommonJS.
+  } else if (typeof exports !== 'undefined') {
+    var $;
+    try { $ = require('jquery'); } catch (e) {}
+    factory(root, exports, $);
+
+    // Browser global.
+  } else {
+    root.in_page_browser = factory(root, Object.create(null), root.jQuery || root.$);
+  }
+
+})(function (root, IP_BROWSER, $) {
+
+  let active = false;
 
 
-  //TODO some day
+  IP_BROWSER._activate = () => {
+    //TODO
+    console.log("TODO: _activate()");
+  };
 
+  IP_BROWSER.activate = () => {
 
-
-  const activate = window.in_page_browser.activate = () => {
+    if (active) {
+      return;
+    }
+    active = !active;
     $(function () {
-      //TODO
-      console.log("TODO: activate()");
+      IP_BROWSER._activate();
     });
   };
 
 
+  IP_BROWSER._deactivate = () => {
+    //TODO
+    console.log("TODO: _deactivate()");
+  };
 
-  const deactivate = window.in_page_browser.deactivate = () => {
+  IP_BROWSER.deactivate = () => {
+
+    if (!active) {
+      return;
+    }
+    active = !active;
     $(function () {
-      //TODO
-      console.log("TODO: deactivate()");
+      IP_BROWSER._deactivate();
     });
   };
 
-  // activate();
+  // IP_BROWSER.activate();
 
-  // setTimeout(deactivate, 7000);
+  // IP_BROWSER.setTimeout(deactivate, 7000);
 
-}
+  return IP_BROWSER;
+});

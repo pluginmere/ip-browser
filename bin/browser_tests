@@ -1,0 +1,89 @@
+#!/usr/bin/env -S node --max-old-space-size=512
+
+
+var http = require('http');
+var express = require('express');
+var path = require('path');
+
+
+var app = express();
+
+const static_options = {
+  dotfiles: 'ignore',
+  etag: false,
+  immutable: false,
+  index: ["../test/browser/index.html"],
+  setHeaders: function (res, path, stat) {
+    res.set('Access-Control-Allow-Origin', '*');
+  }
+};
+
+app.use('/src', express.static(path.resolve(path.join(__dirname, '..', 'src')), static_options));
+app.use('/test', express.static(path.resolve(path.join(__dirname, '..', 'test')), static_options));
+app.use('/node_modules', express.static(path.resolve(path.join(__dirname, '..', 'node_modules')), static_options));
+app.use('/', function (req, res, next) {
+  res.redirect('/test/browser/index.html');
+});
+
+
+
+
+var port = normalizePort(process.env.IP_BROWSER_PORT || '2999');
+process.env.IP_BROWSER_PORT = port;
+app.set('port', port);
+
+
+var server = http.createServer(app);
+
+
+server.listen(port, "0.0.0.0");
+server.on('error', onError);
+server.on('listening', onListening);
+
+
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string' ?
+    'Pipe ' + port :
+    'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+
+function onListening() {
+  console.log(`Please visit http://localhost:${server.address().port}/`);
+}
